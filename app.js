@@ -1004,6 +1004,53 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- OPTIMIZACIONES MÓVIL Y TOUCH EN APP.JS ---
+
+    // 1. Cerrar menú móvil al hacer clic fuera o seleccionar una opción
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                navMenu.classList.remove('active');
+                const icon = mobileNavToggle.querySelector('i');
+                if (icon) icon.className = 'fa-solid fa-bars';
+            }
+        });
+    });
+
+    // 2. Desplazamiento táctil (Swipe) en la etapa de Draping Digital
+    const drapingStage = document.getElementById('drapingStage');
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    if (drapingStage) {
+        drapingStage.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        drapingStage.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleDrapeSwipe();
+        }, { passive: true });
+    }
+
+    function handleDrapeSwipe() {
+        const drapeBtns = document.querySelectorAll('.drape-color-btn');
+        if (drapeBtns.length === 0) return;
+
+        let activeIndex = Array.from(drapeBtns).findIndex(btn => btn.classList.contains('active'));
+
+        // Swipe Izquierda (Siguiente color de paño)
+        if (touchStartX - touchEndX > 50) {
+            let nextIndex = (activeIndex + 1) % drapeBtns.length;
+            drapeBtns[nextIndex].click();
+        }
+        // Swipe Derecha (Color de paño anterior)
+        if (touchEndX - touchStartX > 50) {
+            let prevIndex = (activeIndex - 1 + drapeBtns.length) % drapeBtns.length;
+            drapeBtns[prevIndex].click();
+        }
+    }
+
     // Initialize with default dashboard details (Soft Summer)
     updateDashboard('soft-summer');
 });
