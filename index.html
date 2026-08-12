@@ -382,30 +382,53 @@
                 <!-- Auxiliary Recommendations Grid (Makeup & Jewelry) -->
                 <div class="recommendations-container">
                     <h3 class="recommendations-section-title">Guía de Compras Curada</h3>
-                    <div class="recommendations-grid">
-                        <!-- Makeup Match Card -->
-                        <div class="rec-card" id="recCardMakeup">
-                            <div class="rec-icon"><i class="fa-solid fa-wand-lipstick"></i></div>
-                            <div class="rec-content">
-                                <h4>Makeup Match (Sugerencias de Cosmética)</h4>
-                                <p class="rec-intro">Productos reales alineados con el croma y temperatura de tu estación:</p>
-                                <ul class="rec-list" id="makeupRecommendationList">
-                                    <!-- Populated dynamically -->
-                                </ul>
-                            </div>
+                    <div id="colorimetry-guides" class="guides-container">
+                      <!-- GUÍA DE JOYERÍA Y METALES -->
+                      <div class="guide-card jewelry-card">
+                        <div class="card-header">
+                          <span class="icon">✨</span>
+                          <h3>Guía de Joyería & Metales Ideal</h3>
                         </div>
+                        <div class="card-body">
+                          <div class="metals-selector">
+                            <h4>Metales Recomendados:</h4>
+                            <div id="best-metals-list" class="tags-container"></div>
+                          </div>
+                          
+                          <div class="gems-section">
+                            <h4>Gemas & Piedras Armónicas:</h4>
+                            <div id="gems-grid" class="gems-grid"></div>
+                          </div>
 
-                        <!-- Jewelry Guide Card -->
-                        <div class="rec-card" id="recCardJewelry">
-                            <div class="rec-icon"><i class="fa-solid fa-gem"></i></div>
-                            <div class="rec-content">
-                                <h4>Guía de Joyería y Metales</h4>
-                                <p class="rec-intro">Metales sugeridos que complementan el tono y subtono de tu piel:</p>
-                                <div class="jewelry-display" id="jewelryRecommendationDisplay">
-                                    <!-- Populated dynamically -->
-                                </div>
-                            </div>
+                          <div class="styling-tip">
+                            <p><strong>💡 Consejo de Estilo:</strong> <span id="jewelry-tip"></span></p>
+                          </div>
                         </div>
+                      </div>
+
+                      <!-- GUÍA DE MAQUILLAJE (MAKEUP MATCH) -->
+                      <div class="guide-card makeup-card">
+                        <div class="card-header">
+                          <span class="icon">💄</span>
+                          <h3>Makeup Match Recomendado</h3>
+                        </div>
+                        <div class="card-body">
+                          <div class="makeup-row">
+                            <span>Subtono de Base:</span>
+                            <strong id="makeup-undertone"></strong>
+                          </div>
+
+                          <h4>Tonos de Labiales Recomendados:</h4>
+                          <div id="lipstick-swatches" class="swatches-grid"></div>
+
+                          <h4>Sombras y Delineadores:</h4>
+                          <div id="eyeshadow-tags" class="tags-container"></div>
+
+                          <div class="styling-tip">
+                            <p><strong>✨ Acabados:</strong> <span id="makeup-advice"></span></p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                 </div>
             </div>
