@@ -98,7 +98,10 @@ document.addEventListener('DOMContentLoaded', () => {
     btnModelCool.addEventListener('click', () => selectModel('cool'));
     btnModelWarm.addEventListener('click', () => selectModel('warm'));
 
-    // --- 3. MOCK UPLOAD LOGIC ---
+    // Variable para almacenar el archivo real o resetear
+    let selectedFile = null;
+
+    // --- 3. UPLOAD LOGIC ---
     btnTriggerUpload.addEventListener('click', (e) => {
         e.stopPropagation();
         realFileInput.click();
@@ -111,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
     realFileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
+            selectedFile = file; // Guardar referencia al archivo
             const reader = new FileReader();
             reader.onload = (event) => {
                 state.activeModel = 'custom';
@@ -135,6 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function resetUploadUI() {
         realFileInput.value = '';
         state.customImageSrc = null;
+        selectedFile = null;
         fileUploadMock.style.display = 'flex';
         uploadSuccessIndicator.style.display = 'none';
     }
@@ -651,96 +656,131 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 6. HANDLE SCANNING SIMULATION FLOW ---
-    btnStartAnalysis.addEventListener('click', () => {
+    btnStartAnalysis.addEventListener('click', async () => {
         if (state.isScanning) return;
         
-        state.isScanning = true;
-        btnStartAnalysis.disabled = true;
-        btnStartAnalysis.querySelector('span').textContent = 'Analizando...';
-        
-        // Reset and Show Overlay
-        scanningOverlay.style.display = 'flex';
-        metricFillTemp.style.width = '0%';
-        metricValTemp.textContent = '0%';
-        metricFillVal.style.width = '0%';
-        metricValVal.textContent = '0%';
-        metricFillCroma.style.width = '0%';
-        metricValCroma.textContent = '0%';
-
-        // Dynamic targets based on selected model
-        let targetTemp = 0; // percentage warm (low is cool)
-        let targetVal = 0;  // percentage clarity (low is dark)
-        let targetCroma = 0;// percentage saturation (low is muted)
-        let targetStation = 'soft-summer';
-
-        if (state.activeModel === 'cool') {
-            targetTemp = 24; // Cool
-            targetVal = 62;  // Medium-Light
-            targetCroma = 35; // Muted (Soft)
-            targetStation = 'soft-summer';
-        } else if (state.activeModel === 'warm') {
-            targetTemp = 86; // Warm
-            targetVal = 28;  // Dark
-            targetCroma = 45; // Medium Muted
-            targetStation = 'deep-autumn';
-        } else {
-            // Random assignment for custom image upload to simulate IA diversity
-            const stations = ['bright-winter', 'warm-spring', 'cool-summer', 'warm-autumn', 'light-spring', 'light-summer', 'deep-winter', 'soft-autumn', 'bright-spring'];
-            targetStation = stations[Math.floor(Math.random() * stations.length)];
+        // Si no subió foto, procesamos según los presets locales
+        if (state.activeModel !== 'custom' || !selectedFile) {
+            state.isScanning = true;
+            btnStartAnalysis.disabled = true;
+            btnStartAnalysis.querySelector('span').textContent = 'Analizando...';
             
-            // Approximate matching sliders
-            if (targetStation.includes('winter') || targetStation.includes('summer')) {
-                targetTemp = Math.floor(Math.random() * 30) + 10;
-            } else {
-                targetTemp = Math.floor(Math.random() * 30) + 65;
+            // Reset and Show Overlay
+            scanningOverlay.style.display = 'flex';
+            metricFillTemp.style.width = '0%';
+            metricValTemp.textContent = '0%';
+            metricFillVal.style.width = '0%';
+            metricValVal.textContent = '0%';
+            metricFillCroma.style.width = '0%';
+            metricValCroma.textContent = '0%';
+
+            // Dynamic targets based on selected model
+            let targetTemp = 0; // percentage warm (low is cool)
+            let targetVal = 0;  // percentage clarity (low is dark)
+            let targetCroma = 0;// percentage saturation (low is muted)
+            let targetStation = 'soft-summer';
+
+            if (state.activeModel === 'cool') {
+                targetTemp = 24; // Cool
+                targetVal = 62;  // Medium-Light
+                targetCroma = 35; // Muted (Soft)
+                targetStation = 'soft-summer';
+            } else if (state.activeModel === 'warm') {
+                targetTemp = 86; // Warm
+                targetVal = 28;  // Dark
+                targetCroma = 45; // Medium Muted
+                targetStation = 'deep-autumn';
             }
 
-            if (targetStation.includes('light') || targetStation.includes('spring') || targetStation.includes('summer')) {
-                targetVal = Math.floor(Math.random() * 35) + 60;
-            } else {
-                targetVal = Math.floor(Math.random() * 35) + 15;
-            }
+            // Progress bar animation loop
+            let currentProgress = 0;
+            const scanInterval = setInterval(() => {
+                currentProgress += 2;
+                
+                // Calculate current slider levels
+                const tempVal = Math.min(Math.floor((currentProgress / 100) * targetTemp), targetTemp);
+                const valVal = Math.min(Math.floor((currentProgress / 100) * targetVal), targetVal);
+                const cromaVal = Math.min(Math.floor((currentProgress / 100) * targetCroma), targetCroma);
 
-            if (targetStation.includes('bright') || targetStation.includes('winter') || targetStation.includes('spring')) {
-                targetCroma = Math.floor(Math.random() * 40) + 60;
-            } else {
-                targetCroma = Math.floor(Math.random() * 40) + 15;
-            }
+                // Update UI Widths
+                metricFillTemp.style.width = `${tempVal}%`;
+                metricValTemp.textContent = tempVal < 40 ? `Frío (${100 - tempVal * 2}%)` : `Cálido (${tempVal}%)`;
+                
+                metricFillVal.style.width = `${valVal}%`;
+                metricValVal.textContent = valVal < 50 ? `Claro (${100 - valVal * 2}%)` : `Oscuro (${valVal}%)`;
+                
+                metricFillCroma.style.width = `${cromaVal}%`;
+                metricValCroma.textContent = cromaVal < 50 ? `Suave (${100 - cromaVal * 2}%)` : `Brillante (${cromaVal}%)`;
+
+                if (currentProgress >= 100) {
+                    clearInterval(scanInterval);
+                    
+                    // End Analysis
+                    setTimeout(() => {
+                        scanningOverlay.style.display = 'none';
+                        state.isScanning = false;
+                        btnStartAnalysis.disabled = false;
+                        btnStartAnalysis.querySelector('span').textContent = 'Iniciar Análisis de IA';
+                        
+                        // Activate corresponding tab in dashboard
+                        stationTabs.forEach(tab => {
+                            if (tab.getAttribute('data-station') === targetStation) {
+                                tab.classList.add('active');
+                                tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                            } else {
+                                tab.classList.remove('active');
+                            }
+                        });
+
+                        // Update contents
+                        updateDashboard(targetStation);
+
+                        // Scroll to Dashboard smoothly
+                        dashboardSection.scrollIntoView({ behavior: 'smooth' });
+                    }, 800);
+                }
+            }, 50);
+            return;
         }
 
-        // Progress bar animation loop
-        let currentProgress = 0;
-        const scanInterval = setInterval(() => {
-            currentProgress += 2;
-            
-            // Calculate current slider levels
-            const tempVal = Math.min(Math.floor((currentProgress / 100) * targetTemp), targetTemp);
-            const valVal = Math.min(Math.floor((currentProgress / 100) * targetVal), targetVal);
-            const cromaVal = Math.min(Math.floor((currentProgress / 100) * targetCroma), targetCroma);
+        // Real API flow for custom uploads
+        state.isScanning = true;
+        btnStartAnalysis.disabled = true;
+        scanningOverlay.style.display = 'flex';
 
-            // Update UI Widths
-            metricFillTemp.style.width = `${tempVal}%`;
-            metricValTemp.textContent = tempVal < 40 ? `Frío (${100 - tempVal * 2}%)` : `Cálido (${tempVal}%)`;
-            
-            metricFillVal.style.width = `${valVal}%`;
-            metricValVal.textContent = valVal < 50 ? `Claro (${100 - valVal * 2}%)` : `Oscuro (${valVal}%)`;
-            
-            metricFillCroma.style.width = `${cromaVal}%`;
-            metricValCroma.textContent = cromaVal < 50 ? `Suave (${100 - cromaVal * 2}%)` : `Brillante (${cromaVal}%)`;
+        const formData = new FormData();
+        formData.append('file', selectedFile);
 
-            if (currentProgress >= 100) {
-                clearInterval(scanInterval);
-                
-                // End Analysis
+        try {
+            // Petición al Backend Python
+            const response = await fetch('http://localhost:8000/api/analyze-color', {
+                method: 'POST',
+                body: formData
+            });
+
+            const resData = await response.json();
+
+            if (resData.status === 'success') {
+                const { temperature, value, chroma, station_key } = resData.data;
+
+                // Actualizar la interfaz gráfica con datos reales obtenidos
+                metricFillTemp.style.width = `${temperature}%`;
+                metricValTemp.textContent = temperature < 50 ? `Frío (${100 - temperature}%)` : `Cálido (${temperature}%)`;
+
+                metricFillVal.style.width = `${value}%`;
+                metricValVal.textContent = value > 50 ? `Claro (${value}%)` : `Oscuro (${100 - value}%)`;
+
+                metricFillCroma.style.width = `${chroma}%`;
+                metricValCroma.textContent = chroma < 50 ? `Suave (${100 - chroma}%)` : `Brillante (${chroma}%)`;
+
                 setTimeout(() => {
                     scanningOverlay.style.display = 'none';
                     state.isScanning = false;
                     btnStartAnalysis.disabled = false;
-                    btnStartAnalysis.querySelector('span').textContent = 'Iniciar Análisis de IA';
-                    
-                    // Activate corresponding tab in dashboard
+
+                    // Seleccionar tab y renderizar estación
                     stationTabs.forEach(tab => {
-                        if (tab.getAttribute('data-station') === targetStation) {
+                        if (tab.getAttribute('data-station') === station_key) {
                             tab.classList.add('active');
                             tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
                         } else {
@@ -748,14 +788,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     });
 
-                    // Update contents
-                    updateDashboard(targetStation);
-
-                    // Scroll to Dashboard smoothly
+                    updateDashboard(station_key);
                     dashboardSection.scrollIntoView({ behavior: 'smooth' });
-                }, 800);
+                }, 1000);
+            } else {
+                throw new Error(resData.detail || "Error en el análisis de color");
             }
-        }, 50);
+        } catch (error) {
+            console.error("Error analizando la imagen:", error);
+            alert("Ocurrió un error al procesar la imagen en el servidor.");
+            scanningOverlay.style.display = 'none';
+            state.isScanning = false;
+            btnStartAnalysis.disabled = false;
+        }
     });
 
     // --- 7. STATION TAB CHANGING EVENT ---
