@@ -702,9 +702,89 @@ document.addEventListener('DOMContentLoaded', () => {
             makeupAdvice.textContent = dbData.makeup.finishesAdvice;
         }
 
+        // Call the user's specific guides update function
+        updateDashboardGuides(stationKey);
+
         // Update Aura Glow Bar Top color to first Power Trio color
         if (data.powerTrio.length > 0) {
             auraGlowBar.style.background = `linear-gradient(90deg, var(--color-bg-beige), ${data.powerTrio[0].hex}, ${data.powerTrio[1].hex}, var(--color-bg-cream))`;
+        }
+    }
+
+    // --- 5.5. USER SPECIFIC RENDERING FUNCTION ---
+    function updateDashboardGuides(stationKey) {
+        let stationData = typeof STATIONS_GUIDE_DATABASE !== 'undefined' ? STATIONS_GUIDE_DATABASE[stationKey] : null;
+        if (!stationData) {
+            // Generate fallback data dynamically so it never breaks or shows outdated data
+            const baseData = allStations[stationKey];
+            if (!baseData) return;
+            stationData = {
+                name: baseData.name,
+                jewelry: {
+                    bestMetals: baseData.jewelry.metals,
+                    recommendedGems: [{ name: "Piedras de la estación", desc: "Gemas en armonía con tus colores." }],
+                    stylingTip: baseData.jewelry.desc
+                },
+                makeup: {
+                    undertone: stationKey.includes('autumn') || stationKey.includes('spring') ? "Cálido / Dorado" : "Frío / Rosado",
+                    lips: baseData.palette.slice(0, 3).map((c, i) => ({ name: `Tono ${i+1}`, hex: c.hex })),
+                    eyeshadows: ["Tonos neutros de la paleta"],
+                    finishesAdvice: "Usa acabados en armonía con tu contraste natural."
+                }
+            };
+        }
+
+        // --- 1. RENDERIZAR JOYERÍA ---
+        const metalsContainer = document.getElementById('best-metals-list');
+        if (metalsContainer) {
+            metalsContainer.innerHTML = stationData.jewelry.bestMetals
+                .map(metal => `<span class="tag metal-tag">${metal}</span>`)
+                .join('');
+        }
+
+        const gemsGrid = document.getElementById('gems-grid');
+        if (gemsGrid) {
+            gemsGrid.innerHTML = stationData.jewelry.recommendedGems
+                .map(gem => `
+                    <div class="gem-item">
+                        <strong>${gem.name}</strong>
+                        <p>${gem.desc}</p>
+                    </div>
+                `).join('');
+        }
+
+        const jewelryTip = document.getElementById('jewelry-tip');
+        if (jewelryTip) {
+            jewelryTip.textContent = stationData.jewelry.stylingTip;
+        }
+
+        // --- 2. RENDERIZAR MAQUILLAJE ---
+        const makeupUndertone = document.getElementById('makeup-undertone');
+        if (makeupUndertone) {
+            makeupUndertone.textContent = stationData.makeup.undertone;
+        }
+
+        const lipSwatches = document.getElementById('lipstick-swatches');
+        if (lipSwatches) {
+            lipSwatches.innerHTML = stationData.makeup.lips
+                .map(lip => `
+                    <div class="swatch-item">
+                        <span class="color-circle" style="background-color: ${lip.hex}"></span>
+                        <span class="color-name">${lip.name}</span>
+                    </div>
+                `).join('');
+        }
+
+        const eyeshadowsContainer = document.getElementById('eyeshadow-tags');
+        if (eyeshadowsContainer) {
+            eyeshadowsContainer.innerHTML = stationData.makeup.eyeshadows
+                .map(shade => `<span class="tag shade-tag">${shade}</span>`)
+                .join('');
+        }
+
+        const makeupAdvice = document.getElementById('makeup-advice');
+        if (makeupAdvice) {
+            makeupAdvice.textContent = stationData.makeup.finishesAdvice;
         }
     }
 

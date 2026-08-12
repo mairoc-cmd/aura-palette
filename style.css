@@ -1840,3 +1840,70 @@ section {
     border: 1px solid #ccc;
 }
 
+/* Specific classes for updateDashboardGuides */
+.tag {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: var(--border-radius-pill);
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.metal-tag {
+    background-color: rgba(212, 175, 55, 0.1);
+    color: var(--color-gold-dark);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.shade-tag {
+    background-color: rgba(186, 196, 201, 0.15);
+    color: #5D6D7E;
+    border: 1px solid rgba(186, 196, 201, 0.3);
+}
+
+.gem-item {
+    background: var(--color-bg-cream);
+    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    border-left: 3px solid var(--color-gold);
+}
+
+.gem-item strong {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--color-dark);
+    margin-bottom: 0.2rem;
+}
+
+.gem-item p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--color-dark-muted);
+}
+
+.swatch-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    border: 1px solid rgba(227, 196, 184, 0.3);
+    background: #fff;
+    font-size: 0.85rem;
+}
+
+.color-circle {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    display: inline-block;
+}
+
+.color-name {
+    font-weight: 500;
+}
+
