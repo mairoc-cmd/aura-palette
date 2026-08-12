@@ -718,18 +718,58 @@ document.addEventListener('DOMContentLoaded', () => {
             // Generate fallback data dynamically so it never breaks or shows outdated data
             const baseData = allStations[stationKey];
             if (!baseData) return;
+
+            const isWarm = stationKey.includes('spring') || stationKey.includes('autumn');
+            const isSummer = stationKey.includes('summer');
+            const isWinter = stationKey.includes('winter');
+            
             stationData = {
                 name: baseData.name,
                 jewelry: {
-                    bestMetals: baseData.jewelry.metals,
-                    recommendedGems: [{ name: "Piedras de la estación", desc: "Gemas en armonía con tus colores." }],
+                    bestMetals: isWarm 
+                        ? ["Oro Amarillo", "Oro Rosa Cálido", "Bronce Cálido"]
+                        : ["Plata", "Platino", "Oro Blanco"],
+                    avoidMetals: isWarm
+                        ? ["Plata Fina", "Peltre"]
+                        : ["Oro Amarillo", "Cobre"],
+                    finishes: isSummer || stationKey.includes('soft')
+                        ? ["Satinado", "Mate", "Cepillado"]
+                        : ["Brillante", "Espejo", "Pulido"],
+                    recommendedGems: isWarm
+                        ? [
+                            { name: "Ámbar / Citrino", desc: "Aporta calidez natural a tus rasgos." },
+                            { name: "Turquesa Cálida", desc: "El contraste ideal para tu paleta." }
+                          ]
+                        : [
+                            { name: "Zafiro Azul", desc: "Aporta contraste dramático frío." },
+                            { name: "Diamante / Rubí", desc: "Brillo nítido y elegante." }
+                          ],
                     stylingTip: baseData.jewelry.desc
                 },
                 makeup: {
-                    undertone: stationKey.includes('autumn') || stationKey.includes('spring') ? "Cálido / Dorado" : "Frío / Rosado",
-                    lips: baseData.palette.slice(0, 3).map((c, i) => ({ name: `Tono ${i+1}`, hex: c.hex })),
-                    eyeshadows: ["Tonos neutros de la paleta"],
-                    finishesAdvice: "Usa acabados en armonía con tu contraste natural."
+                    undertone: isWarm ? "Cálido / Dorado / Melocotón" : "Frío / Rosado / Neutro-Frío",
+                    foundations: isWarm 
+                        ? ["Subtono Dorado / Peach", "BB Cream acabado Radiante"]
+                        : ["Subtono Frío / Rosado", "Acabado Natural Mate"],
+                    lips: isWarm
+                        ? [
+                            { name: "Melocotón", hex: "#E7987D" },
+                            { name: "Coral", hex: "#FF6F61" },
+                            { name: "Rojo Cálido", hex: "#D33F29" }
+                          ]
+                        : [
+                            { name: "Rosa Empolvado", hex: "#D8A7B1" },
+                            { name: "Berry", hex: "#8C5366" },
+                            { name: "Rubí Frío", hex: "#A6192E" }
+                          ],
+                    blush: isWarm ? ["Albaricoque", "Coral Cálido"] : ["Rosa Frío", "Malva Suave"],
+                    eyeshadows: isWarm 
+                        ? ["Bronce", "Champagne", "Marrón Cálido", "Cobre"] 
+                        : ["Taupe Frío", "Slate Gray", "Gris Ceniza", "Plata"],
+                    eyeliner: isWarm ? ["Marrón", "Oliva"] : ["Gris Carbón", "Negro"],
+                    finishesAdvice: isWarm 
+                        ? "Opta por acabados luminosos y jugosos. Evita los labiales y bases ultra mate."
+                        : "Los sombreados fríos y acabados satinados definidos favorecen tu armonía."
                 }
             };
         }
