@@ -752,8 +752,8 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('file', selectedFile);
 
         try {
-            // Petición al Backend Python
-            const response = await fetch('http://localhost:8000/api/analyze-color', {
+            // Petición al Backend Python en Render
+            const response = await fetch('https://aura-palette.onrender.com/api/analyze-color', {
                 method: 'POST',
                 body: formData
             });
