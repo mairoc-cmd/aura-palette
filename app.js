@@ -600,8 +600,58 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Render Makeup Recommendations
         makeupRecommendationList.innerHTML = '';
+        
+        // Check if there is extended data in the database
+        const dbData = typeof STATIONS_GUIDE_DATABASE !== 'undefined' ? STATIONS_GUIDE_DATABASE[stationKey] : null;
+        
+        if (dbData && dbData.makeup) {
+            // Extended makeup info
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'extended-makeup-info';
+            infoDiv.style.marginBottom = '1.2rem';
+            infoDiv.style.fontSize = '0.9rem';
+            infoDiv.style.display = 'flex';
+            infoDiv.style.flexDirection = 'column';
+            infoDiv.style.gap = '0.5rem';
+            
+            infoDiv.innerHTML = `
+                <div><strong>Subtono:</strong> ${dbData.makeup.undertone}</div>
+                <div><strong>Bases recomendadas:</strong> ${dbData.makeup.foundations.join(', ')}</div>
+                <div style="display:flex; flex-wrap:wrap; align-items:center; gap:0.5rem; margin-top:0.3rem;">
+                    <strong>Labios recomendados:</strong>
+                    ${dbData.makeup.lips.map(lip => `
+                        <span style="display:inline-flex; align-items:center; gap:0.3rem; padding:0.2rem 0.6rem; border-radius:4px; border:1px solid #ddd; background:#fff; font-size:0.8rem;">
+                            <span style="width:12px; height:12px; border-radius:50%; background-color:${lip.hex}; border:1px solid #ccc; display:inline-block;"></span>
+                            ${lip.name}
+                        </span>
+                    `).join('')}
+                </div>
+                <div><strong>Rubor:</strong> ${dbData.makeup.blush.join(', ')}</div>
+                <div><strong>Sombras:</strong> ${dbData.makeup.eyeshadows.join(', ')}</div>
+                <div><strong>Delineador:</strong> ${dbData.makeup.eyeliner.join(', ')}</div>
+                <p style="margin-top:0.4rem; font-style:italic; font-size:0.82rem; color:var(--color-dark-muted);">${dbData.makeup.finishesAdvice}</p>
+            `;
+            makeupRecommendationList.appendChild(infoDiv);
+            
+            // Add a divider
+            const divider = document.createElement('hr');
+            divider.style.border = '0';
+            divider.style.borderTop = '1px solid #e3c4b8';
+            divider.style.margin = '1rem 0';
+            makeupRecommendationList.appendChild(divider);
+        }
+        
+        // Add the real products list
+        const prodTitle = document.createElement('h5');
+        prodTitle.textContent = 'Productos de Marca Sugeridos:';
+        prodTitle.style.fontSize = '0.85rem';
+        prodTitle.style.marginBottom = '0.5rem';
+        prodTitle.style.color = 'var(--color-gold-dark)';
+        makeupRecommendationList.appendChild(prodTitle);
+
         data.makeup.forEach(item => {
             const li = document.createElement('li');
+            li.style.marginBottom = '0.4rem';
             li.innerHTML = `
                 <strong>${item.category}:</strong> ${item.brand} - <span>${item.name}</span>
             `;
@@ -618,11 +668,12 @@ document.addEventListener('DOMContentLoaded', () => {
         badgeContainer.style.flexWrap = 'wrap';
         badgeContainer.style.marginBottom = '1rem';
         
-        data.jewelry.metals.forEach(metal => {
+        // If we have DB data, use bestMetals, else fallback to standard
+        const metalsToRender = dbData && dbData.jewelry ? dbData.jewelry.bestMetals : data.jewelry.metals;
+        metalsToRender.forEach(metal => {
             const badge = document.createElement('span');
             badge.className = 'metal-badge';
             
-            // Assign sub-style based on metal name
             if (metal.includes('Oro Amarillo')) {
                 badge.className += ' metal-gold';
                 badge.innerHTML = `<i class="fa-solid fa-ring"></i> ${metal}`;
@@ -635,14 +686,41 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             badgeContainer.appendChild(badge);
         });
-        
         jewelryRecommendationDisplay.appendChild(badgeContainer);
 
-        // Text explanation
-        const descPara = document.createElement('p');
-        descPara.className = 'finish-text';
-        descPara.textContent = data.jewelry.desc;
-        jewelryRecommendationDisplay.appendChild(descPara);
+        if (dbData && dbData.jewelry) {
+            // Render extra details for jewelry
+            const extraJewelryDiv = document.createElement('div');
+            extraJewelryDiv.className = 'extended-jewelry-info';
+            extraJewelryDiv.style.fontSize = '0.88rem';
+            extraJewelryDiv.style.display = 'flex';
+            extraJewelryDiv.style.flexDirection = 'column';
+            extraJewelryDiv.style.gap = '0.6rem';
+            extraJewelryDiv.style.marginTop = '0.8rem';
+            
+            extraJewelryDiv.innerHTML = `
+                <div><strong>Evitar metales:</strong> <span style="color:#c0392b;">${dbData.jewelry.avoidMetals.join(', ')}</span></div>
+                <div><strong>Acabados recomendados:</strong> ${dbData.jewelry.finishes.join(', ')}</div>
+                <div style="margin-top:0.4rem;">
+                    <strong>Gemas recomendadas:</strong>
+                    <ul style="margin: 0.3rem 0 0 1.2rem; padding: 0; list-style-type: circle; display:flex; flex-direction:column; gap:0.3rem;">
+                        ${dbData.jewelry.recommendedGems.map(gem => `
+                            <li><strong>${gem.name}:</strong> ${gem.desc}</li>
+                        `).join('')}
+                    </ul>
+                </div>
+                <p style="margin-top:0.4rem; font-style:italic; font-size:0.82rem; color:var(--color-dark-muted);">
+                    <strong>Tip de estilo:</strong> ${dbData.jewelry.stylingTip}
+                </p>
+            `;
+            jewelryRecommendationDisplay.appendChild(extraJewelryDiv);
+        } else {
+            // Text explanation fallback
+            const descPara = document.createElement('p');
+            descPara.className = 'finish-text';
+            descPara.textContent = data.jewelry.desc;
+            jewelryRecommendationDisplay.appendChild(descPara);
+        }
 
         // Update Aura Glow Bar Top color to first Power Trio color
         if (data.powerTrio.length > 0) {
