@@ -1638,91 +1638,213 @@ section {
     }
 }
 
+/* ==========================================================================
+   OPTIMIZACIONES MÓVIL Y RESPONSIVE (Mobile-First Polish)
+   ========================================================================== */
+
+/* Touch Target Standard (WCAG AAA) */
+button, 
+.btn, 
+.station-tab, 
+.drape-color-btn, 
+.palette-color-dot, 
+.nav-link {
+    min-height: 44px;
+    min-width: 44px;
+}
+
 @media (max-width: 768px) {
-    .mobile-nav-toggle {
-        display: block;
+    /* 1. Ajuste General de Contenedores y Espaciado */
+    section {
+        padding: 4rem 0;
     }
-    
+
+    .hero-section {
+        padding-top: 6rem;
+        min-height: auto;
+    }
+
+    .hero-title {
+        font-size: 2.2rem;
+        line-height: 1.2;
+    }
+
+    .hero-description {
+        font-size: 1rem;
+    }
+
+    .hero-cta-group {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.8rem;
+    }
+
+    .hero-cta-group .btn {
+        width: 100%;
+    }
+
+    /* 2. Menu de Navegación Móvil */
+    .mobile-nav-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        font-size: 1.4rem;
+        background: transparent;
+        border: none;
+        color: var(--color-dark);
+        cursor: pointer;
+    }
+
     .nav-menu {
         display: none;
-        position: absolute;
-        top: 100%;
+        position: fixed;
+        top: 60px;
         left: 0;
         width: 100%;
-        background-color: var(--color-bg-cream);
-        border-bottom: 1px solid rgba(227, 196, 184, 0.4);
-        padding: 1.5rem;
-        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
+        height: calc(100vh - 60px);
+        background-color: rgba(253, 251, 247, 0.98);
+        backdrop-filter: blur(12px);
+        padding: 2rem 1.5rem;
+        z-index: 998;
+        overflow-y: auto;
     }
-    
+
     .nav-menu.active {
         display: block;
+        animation: fadeInDown 0.3s ease-out forwards;
     }
-    
+
     .nav-menu ul {
         flex-direction: column;
-        gap: 1.5rem;
-        align-items: stretch;
+        gap: 1.8rem;
+        align-items: center;
     }
-    
+
     .nav-link {
-        display: block;
-        padding: 0.5rem 0;
+        font-size: 1rem;
+        letter-spacing: 0.15em;
     }
-    
-    .nav-link-highlight {
-        text-align: center;
-    }
-    
-    .hero-title {
-        font-size: 2.3rem;
-    }
-    
-    .section-title {
-        font-size: 2rem;
-    }
-    
-    .method-card {
-        padding: 2.5rem 2rem;
-    }
-    
-    .persona-card {
-        padding: 2rem;
-    }
-    
-    .persona-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-    
-    .analyzer-setup {
-        padding: 2rem;
-    }
-    
-    .model-options {
+
+    /* 3. Escáner de Aura / Analizador de Imagen */
+    .analyzer-wrapper {
         grid-template-columns: 1fr;
+        gap: 2rem;
     }
-    
-    .dashboard-card {
+
+    .analyzer-setup {
         padding: 1.5rem;
     }
-    
+
+    .display-canvas-wrapper {
+        max-width: 100%;
+        aspect-ratio: 0.85;
+    }
+
+    /* 4. Draping Digital e Interacción Táctil */
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .draping-stage {
+        aspect-ratio: 0.85;
+    }
+
+    .draping-portrait {
+        width: 85%;
+        height: 85%;
+    }
+
+    /* Desplazamiento Horizontal Suave para Paletas de Colores */
+    .tab-scroll-container,
+    .drape-color-tray {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 0.5rem;
+        gap: 0.8rem;
+    }
+
+    .station-tab {
+        scroll-snap-align: start;
+        flex-shrink: 0;
+    }
+
+    .drape-color-btn {
+        scroll-snap-align: center;
+        flex-shrink: 0;
+        width: 44px;
+        height: 44px;
+    }
+
+    /* Grilla de Paleta Maestra adaptable a pantallas chicas */
     .color-palette-grid {
         grid-template-columns: repeat(5, 1fr);
+        gap: 0.6rem;
     }
-    
-    .power-trio-display {
-        grid-template-columns: 1fr;
+
+    .palette-color-dot {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1;
     }
-    
-    .rec-card, .guide-card {
-        padding: 1.5rem;
-        flex-direction: column;
-    }
+
+    /* 5. Guía de Compras y Swatches en Móvil */
+    .recommendations-grid,
     .guides-container {
         grid-template-columns: 1fr;
         gap: 1.5rem;
+    }
+
+    .swatches-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+    }
+
+    .swatch-item {
+        margin-bottom: 0.5rem;
+    }
+
+    /* 6. Timeline del Roadmap en Móvil */
+    .roadmap-timeline::before {
+        left: 20px;
+    }
+
+    .timeline-item {
+        width: 100%;
+        padding-left: 3.5rem;
+        padding-right: 0;
+        text-align: left !important;
+    }
+
+    .timeline-item:nth-child(even) {
+        left: 0;
+    }
+
+    .timeline-badge {
+        left: 0 !important;
+        right: auto !important;
+        width: 38px;
+        height: 38px;
+    }
+
+    .timeline-content {
+        padding: 1.5rem;
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
@@ -1835,5 +1957,6 @@ section {
   font-size: 0.85rem;
   color: #4a5568;
 }
+
 
 
